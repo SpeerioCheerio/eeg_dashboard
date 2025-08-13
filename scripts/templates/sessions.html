@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>EEG Sessions</h1>
+<h2>User: {{ email }}</h2>
+
+<div class="nav-links">
+    <a href="{{ url_for('logout') }}">Change User</a>
+</div>
+
+{% if sessions %}
+<table>
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Type</th>
+            <th>Duration</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for session in sessions %}
+        <tr>
+            <td>{{ session.date }}</td>
+            <td>{{ session.time }}</td>
+            <td>{{ session.type }}</td>
+            <td>{{ session.duration }}</td>
+            <td class="{% if session.status == 'Ready' %}status-ready{% else %}status-incomplete{% endif %}">
+                {{ session.status }}
+            </td>
+            <td>
+                <a href="{{ url_for('session_detail', session_index=session.index) }}" class="session-link">
+                    View Details
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="info-box">
+    No sessions found for this user.
+</div>
+{% endif %}
+{% endblock %}

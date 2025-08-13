@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Session Details</h1>
+<h2>User: {{ email }}</h2>
+
+<div class="nav-links">
+    <a href="{{ url_for('sessions') }}">Back to Sessions</a>
+    <a href="{{ url_for('logout') }}">Change User</a>
+</div>
+
+<div class="info-box">
+    <strong>Session Information:</strong><br>
+    Date: {{ timestamp }}<br>
+    Type: {{ session_type }}<br>
+    Duration: {{ duration }} minutes<br>
+    Start Time: {{ start_time }}<br>
+    End Time: {{ end_time }}
+</div>
+
+{% if has_data %}
+    <div class="success-box">
+        <strong>EEG Data Found!</strong><br>
+        Retrieved {{ record_count }} EEG records for this session.
+        {% if segments_count %}
+        <br>Estimated segments: {{ segments_count }}
+        {% endif %}
+    </div>
+    
+    {% if plot_json %}
+    <h3>EEG Waveform</h3>
+    <div id="eeg-plot"></div>
+    {% endif %}
+    
+    {% if error %}
+    <div class="error-box">
+        <strong>Processing Error:</strong><br>
+        {{ error }}
+    </div>
+    {% endif %}
+    
+{% else %}
+    <div class="error-box">
+        <strong>No EEG Data</strong><br>
+        No EEG data was found for this session. This could be due to:
+        <ul>
+            <li>No recording was active during the session time</li>
+            <li>Time synchronization issues between session metadata and EEG data</li>
+            <li>Data may have been recorded but not properly stored</li>
+        </ul>
+    </div>
+{% endif %}
+
+<details>
+    <summary>Debug Information</summary>
+    <div class="debug-info">{{ debug_info }}</div>
+</details>
+{% endblock %}
+
+{% block scripts %}
+{% if plot_json %}
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+    var plotData = {{ plot_json|safe }};
+    Plotly.newPlot('eeg-plot', plotData.data, plotData.layout);
+</script>
+{% endif %}
+{% endblock %}
